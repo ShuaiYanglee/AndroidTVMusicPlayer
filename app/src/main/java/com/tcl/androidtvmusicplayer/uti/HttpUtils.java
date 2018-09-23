@@ -18,7 +18,7 @@ public class HttpUtils {
 
     static final OkHttpClient client = new OkHttpClient();
 
-    public static <T> void doGetRequest(String url, final Class<T> tClass,Callback callback){
+    public static void doGetRequest(String url, Callback callback) {
         Request request = new Request.Builder().url(url).build();
         Call call = client.newCall(request);
         call.enqueue(callback);

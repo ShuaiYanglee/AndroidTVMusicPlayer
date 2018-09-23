@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--快速导航栏的颜色-->
+    <color name="fastlane_background">#0096e6</color>
+    <!--搜索的颜色-->
+    <color name="search_opaque">#ffaa3f</color>
+    <!--卡片被选中后的颜色-->
+    <color name="card_selected_color">#ffaa3f</color>
+    <!--卡片的默认颜色-->
+    <color name="card_default_color">#3d3d3d</color>
+
+    <!--MainFragment的背景起始颜色-->
+    <color name="background_gradient_start">#000000</color>
+    <!--MainFragment的背景结束颜色-->
+    <color name="background_gradient_end">#DDDDDD</color>
+
+</resources>
