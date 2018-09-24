@@ -30,13 +30,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tcl.androidtvmusicplayer.R;
+import com.tcl.androidtvmusicplayer.callback.PlayListCallBack;
+import com.tcl.androidtvmusicplayer.callback.TopListCallBack;
 import com.tcl.androidtvmusicplayer.constant.Constants;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
 import com.tcl.androidtvmusicplayer.presenter.CardPresenter;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
 
 import java.io.IOException;
-import java.lang.ref.PhantomReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -54,7 +55,6 @@ import okhttp3.Response;
 
 public class MainFragment extends BrowseFragment {
     private static final String TAG = "MainFragment";
-
     private static final int BACKGROUND_UPDATE_DELAY = 300;
 
     private String backgroundImageUri;//背景图片URI
@@ -66,15 +66,35 @@ public class MainFragment extends BrowseFragment {
     private Timer backgroundTimer;//背景切换计时器
     private BackgroundManager backgroundManager;//背景管理
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "onActivityCreated: ");
+        doGetRequest();
+        setUIElements();
+        prepareBackgroundManager();
+        initAdapter();
+        setupEventListener();
+    }
+
+    private void initAdapter(){
+        rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        setAdapter(rowsAdapter);
+
+    }
+
+    private void doGetRequest(){
+        HttpUtils.doGetRequest(Constants.PLAYLIST_URL_CAT,new PlayListCallBack(this));
+        TopListCallBack topListCallBack = new TopListCallBack(this);
+        for (int i = 1 ;i <= 23;i++){
+        HttpUtils.doGetRequest(Constants.TOP_LIST+i,topListCallBack);
+        }
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        HttpUtils.doGetRequest(Constants.PLAYLIST_URL_CAT,new PlayListCallBack(this));
-        Log.i(TAG, "onActivityCreated: ");
-        setUIElements();
-        prepareBackgroundManager();
-        setupEventListener();
     }
 
 
@@ -100,14 +120,13 @@ public class MainFragment extends BrowseFragment {
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
     }
 
-    private void loadRows(List<PlayList> list){
+    public void loadRows(List<PlayList> list,int index, String headerName){
         CardPresenter cardPresenter = new CardPresenter();
         ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
         listRowAdapter.addAll(0,list);
-        HeaderItem headerItem = new HeaderItem(0,"热门歌单");
-        rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        HeaderItem headerItem = new HeaderItem(index,headerName);
         rowsAdapter.add(new ListRow(headerItem,listRowAdapter));
-        setAdapter(rowsAdapter);
+        rowsAdapter.notifyItemRangeChanged(index,1);
     }
 
 
@@ -176,9 +195,10 @@ public class MainFragment extends BrowseFragment {
     }
 
 
-    private class PlayListCallBack implements Callback{
+    /*private class PlayListCallBack implements Callback{
 
         MainFragment mainFragment;
+
 
         public PlayListCallBack(MainFragment mainFragment) {
             this.mainFragment = mainFragment;
@@ -191,7 +211,6 @@ public class MainFragment extends BrowseFragment {
 
         @Override
         public void onResponse(Call call, Response response) throws IOException {
-
             String jsonString = response.body().string();
             Gson gson = new Gson();
             JsonParser parser = new JsonParser();
@@ -210,10 +229,9 @@ public class MainFragment extends BrowseFragment {
                 }
             });
             Log.d(TAG, "onResponse: "+list.size());
-
         }
-    }
 
+    }*/
 
 
 

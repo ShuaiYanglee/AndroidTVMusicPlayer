@@ -12,4 +12,7 @@ public class Constants {
 
     //华语热门歌单
     public static final String PLAYLIST_URL_CAT = SERVER_HOST + "top/playlist?cat=华语&limit=10&order=hot";
+
+    //排行榜
+    public static final String TOP_LIST = SERVER_HOST+"top/list?idx=";
 }
