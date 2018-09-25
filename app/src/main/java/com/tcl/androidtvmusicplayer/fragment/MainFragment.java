@@ -30,9 +30,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tcl.androidtvmusicplayer.R;
+import com.tcl.androidtvmusicplayer.callback.ArtistCallBack;
 import com.tcl.androidtvmusicplayer.callback.PlayListCallBack;
 import com.tcl.androidtvmusicplayer.callback.TopListCallBack;
 import com.tcl.androidtvmusicplayer.constant.Constants;
+import com.tcl.androidtvmusicplayer.entity.Artist;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
 import com.tcl.androidtvmusicplayer.presenter.CardPresenter;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
@@ -77,18 +79,19 @@ public class MainFragment extends BrowseFragment {
         setupEventListener();
     }
 
-    private void initAdapter(){
+    private void initAdapter() {
         rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setAdapter(rowsAdapter);
 
     }
 
-    private void doGetRequest(){
-        HttpUtils.doGetRequest(Constants.PLAYLIST_URL_CAT,new PlayListCallBack(this));
+    private void doGetRequest() {
+        HttpUtils.doGetRequest(Constants.PLAYLIST_URL_CAT, new PlayListCallBack(this));
         TopListCallBack topListCallBack = new TopListCallBack(this);
-        for (int i = 1 ;i <= 23;i++){
-        HttpUtils.doGetRequest(Constants.TOP_LIST+i,topListCallBack);
+        for (int i = 1; i <= 23; i++) {
+            HttpUtils.doGetRequest(Constants.TOP_LIST + i, topListCallBack);
         }
+        HttpUtils.doGetRequest(Constants.ARTIST, new ArtistCallBack(this));
     }
 
 
@@ -98,7 +101,7 @@ public class MainFragment extends BrowseFragment {
     }
 
 
-    private void setUIElements(){
+    private void setUIElements() {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
 
@@ -112,7 +115,7 @@ public class MainFragment extends BrowseFragment {
         setSearchAffordanceColor(getResources().getColor(R.color.search_opaque));
     }
 
-    private void prepareBackgroundManager(){
+    private void prepareBackgroundManager() {
         backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
         defaultBackground = getResources().getDrawable(R.drawable.default_background);
@@ -120,27 +123,27 @@ public class MainFragment extends BrowseFragment {
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
     }
 
-    public void loadRows(List<PlayList> list,int index, String headerName){
+    public <T> void loadRows(List<T> list, int index, String headerName) {
         CardPresenter cardPresenter = new CardPresenter();
         ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-        listRowAdapter.addAll(0,list);
-        HeaderItem headerItem = new HeaderItem(index,headerName);
-        rowsAdapter.add(new ListRow(headerItem,listRowAdapter));
-        rowsAdapter.notifyItemRangeChanged(index,1);
+        listRowAdapter.addAll(0, list);
+        HeaderItem headerItem = new HeaderItem(index, headerName);
+        rowsAdapter.add(new ListRow(headerItem, listRowAdapter));
+        rowsAdapter.notifyItemRangeChanged(index, 1);
     }
 
 
-    private void setupEventListener(){
+    private void setupEventListener() {
 
         setOnItemViewClickedListener(new ItemViewClickedListener());
 
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
     }
 
-    protected void updateBackground(String uri){
+    protected void updateBackground(String uri) {
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
-        Glide.with(getActivity()).load(uri).centerCrop().error(defaultBackground).into(new SimpleTarget<GlideDrawable>(width,height) {
+        Glide.with(getActivity()).load(uri).centerCrop().error(defaultBackground).into(new SimpleTarget<GlideDrawable>(width, height) {
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                 backgroundManager.setDrawable(resource);
@@ -150,29 +153,33 @@ public class MainFragment extends BrowseFragment {
     }
 
 
-    private final class ItemViewClickedListener implements OnItemViewClickedListener{
+    private final class ItemViewClickedListener implements OnItemViewClickedListener {
 
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-            if (item instanceof PlayList){
+            if (item instanceof PlayList) {
 
             }
         }
     }
 
 
-    private final class ItemViewSelectedListener implements OnItemViewSelectedListener{
+    private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
 
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-            if (item instanceof PlayList){
+            if (item instanceof PlayList) {
                 backgroundImageUri = ((PlayList) item).getCoverImgUrl();
+                startBackgroundTimer();
+            }
+            if (item instanceof Artist) {
+                backgroundImageUri = ((Artist) item).getPicUrl();
                 startBackgroundTimer();
             }
         }
     }
 
-    private class UpdateBackgroundTask extends TimerTask{
+    private class UpdateBackgroundTask extends TimerTask {
 
         @Override
         public void run() {
@@ -186,54 +193,13 @@ public class MainFragment extends BrowseFragment {
     }
 
 
-    private void startBackgroundTimer(){
-        if (null != backgroundTimer){
+    private void startBackgroundTimer() {
+        if (null != backgroundTimer) {
             backgroundTimer.cancel();
         }
         backgroundTimer = new Timer();
-        backgroundTimer.schedule(new UpdateBackgroundTask(),BACKGROUND_UPDATE_DELAY);
+        backgroundTimer.schedule(new UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY);
     }
-
-
-    /*private class PlayListCallBack implements Callback{
-
-        MainFragment mainFragment;
-
-
-        public PlayListCallBack(MainFragment mainFragment) {
-            this.mainFragment = mainFragment;
-        }
-
-        @Override
-        public void onFailure(Call call, IOException e) {
-
-        }
-
-        @Override
-        public void onResponse(Call call, Response response) throws IOException {
-            String jsonString = response.body().string();
-            Gson gson = new Gson();
-            JsonParser parser = new JsonParser();
-            JsonObject object = parser.parse(jsonString).getAsJsonObject();
-            JsonArray jsonArray = object.getAsJsonArray("playlists");
-            final List<PlayList> list = new ArrayList<>();
-            for (JsonElement jsonElement:
-                    jsonArray) {
-                list.add(gson.fromJson(jsonElement,PlayList.class));
-            }
-            list.size();
-            mainFragment.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mainFragment.loadRows(list);
-                }
-            });
-            Log.d(TAG, "onResponse: "+list.size());
-        }
-
-    }*/
-
-
 
 
 }

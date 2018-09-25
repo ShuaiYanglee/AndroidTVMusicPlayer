@@ -8,11 +8,18 @@ package com.tcl.androidtvmusicplayer.constant;
 
 public class Constants {
     //音乐服务器IP
-    public static final String SERVER_HOST ="http://192.168.0.102:3000/";
+    //public static final String SERVER_HOST ="http://192.168.0.102:3000/";
+
+    public static final String SERVER_HOST ="http://10.120.5.25:3000/";
+
 
     //华语热门歌单
     public static final String PLAYLIST_URL_CAT = SERVER_HOST + "top/playlist?cat=华语&limit=10&order=hot";
 
     //排行榜
     public static final String TOP_LIST = SERVER_HOST+"top/list?idx=";
+
+    //歌手榜
+    public static final String ARTIST = SERVER_HOST+"toplist/artist";
+
 }

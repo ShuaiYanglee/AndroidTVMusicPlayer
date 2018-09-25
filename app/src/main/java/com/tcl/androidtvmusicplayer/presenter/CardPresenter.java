@@ -11,12 +11,13 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.tcl.androidtvmusicplayer.R;
+import com.tcl.androidtvmusicplayer.entity.Artist;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
 
 /**
  * Created by yangshuai on 2018/9/23.
  *
- * @Description: 展示歌单
+ * @Description: 展示歌单等信息
  */
 
 public class CardPresenter extends Presenter {
@@ -52,17 +53,29 @@ public class CardPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        PlayList playList = (PlayList) item;
+        if (item instanceof PlayList) {
+            PlayList playList = (PlayList) item;
+            ImageCardView cardView = (ImageCardView) viewHolder.view;
 
-        ImageCardView cardView = (ImageCardView) viewHolder.view;
+            Log.d(TAG, "onBindViewHolder: ");
+            if (playList.getCoverImgUrl() != null) {
+                cardView.setTitleText(playList.getName());
+                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
+                Glide.with(viewHolder.view.getContext()).load(playList.getCoverImgUrl())
+                        .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
+            }
+        }
 
-        Log.d(TAG, "onBindViewHolder: ");
-        if (playList.getCoverImgUrl() != null) {
-            cardView.setTitleText(playList.getName());
-            cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-            Glide.with(viewHolder.view.getContext()).load(playList.getCoverImgUrl())
-                    .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
-
+        if (item instanceof Artist) {
+            Artist artist = (Artist) item;
+            ImageCardView cardView = (ImageCardView) viewHolder.view;
+            Log.d(TAG, "onBindViewHolder: ");
+            if (artist.getPicUrl() != null) {
+                cardView.setTitleText(artist.getName());
+                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
+                Glide.with(viewHolder.view.getContext()).load(artist.getPicUrl())
+                        .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
+            }
         }
 
     }

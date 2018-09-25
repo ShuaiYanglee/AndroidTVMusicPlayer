@@ -3,16 +3,15 @@ package com.tcl.androidtvmusicplayer.entity;
 /**
  * Created by yangshuai on 2018/9/18.
  *
- * @Description: 歌单
+ * @Description: 歌单实体类
  */
 
 public class PlayList {
 
-
-    private String name;
-    private long id;
-    private String coverImgUrl;
-    private String description;
+    private String name;//歌单名
+    private long id;//歌单ID
+    private String coverImgUrl;//歌单封面URL
+    private String description;//歌单描述
 
     public String getName() {
         return name;
