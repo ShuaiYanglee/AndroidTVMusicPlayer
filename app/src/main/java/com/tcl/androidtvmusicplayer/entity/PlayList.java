@@ -1,5 +1,9 @@
 package com.tcl.androidtvmusicplayer.entity;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 /**
  * Created by yangshuai on 2018/9/18.
  *
@@ -12,6 +16,8 @@ public class PlayList {
     private long id;//歌单ID
     private String coverImgUrl;//歌单封面URL
     private String description;//歌单描述
+    @SerializedName("tracks")
+    private List<Song> songList;//歌单中的所有歌曲
 
     public String getName() {
         return name;
@@ -43,5 +49,13 @@ public class PlayList {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Song> getSongList() {
+        return songList;
+    }
+
+    public void setSongList(List<Song> songList) {
+        this.songList = songList;
     }
 }

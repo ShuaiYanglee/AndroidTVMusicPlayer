@@ -8,7 +8,6 @@ package com.tcl.androidtvmusicplayer.entity;
 
 public class Artist {
 
-
     private String name;//歌手名
     private long id;//歌手ID
     private String picUrl;//歌手图片URL

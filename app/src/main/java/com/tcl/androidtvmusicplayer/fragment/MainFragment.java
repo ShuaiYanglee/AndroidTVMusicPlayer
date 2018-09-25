@@ -1,9 +1,9 @@
 package com.tcl.androidtvmusicplayer.fragment;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
@@ -18,20 +18,15 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.tcl.androidtvmusicplayer.R;
+import com.tcl.androidtvmusicplayer.activity.PlayListActivity;
 import com.tcl.androidtvmusicplayer.callback.ArtistCallBack;
-import com.tcl.androidtvmusicplayer.callback.PlayListCallBack;
+import com.tcl.androidtvmusicplayer.callback.PlayListsCallBack;
 import com.tcl.androidtvmusicplayer.callback.TopListCallBack;
 import com.tcl.androidtvmusicplayer.constant.Constants;
 import com.tcl.androidtvmusicplayer.entity.Artist;
@@ -39,15 +34,9 @@ import com.tcl.androidtvmusicplayer.entity.PlayList;
 import com.tcl.androidtvmusicplayer.presenter.CardPresenter;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 /**
  * Created by yangshuai on 2018/9/23.
@@ -86,7 +75,7 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void doGetRequest() {
-        HttpUtils.doGetRequest(Constants.PLAYLIST_URL_CAT, new PlayListCallBack(this));
+        HttpUtils.doGetRequest(Constants.PLAYLIST_URL_CAT, new PlayListsCallBack(this));
         TopListCallBack topListCallBack = new TopListCallBack(this);
         for (int i = 1; i <= 23; i++) {
             HttpUtils.doGetRequest(Constants.TOP_LIST + i, topListCallBack);
@@ -158,7 +147,9 @@ public class MainFragment extends BrowseFragment {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
             if (item instanceof PlayList) {
-
+                Intent intent = new Intent(getActivity(), PlayListActivity.class);
+                intent.putExtra(Constants.PLAYLIST,((PlayList) item).getId());
+                startActivity(intent);
             }
         }
     }

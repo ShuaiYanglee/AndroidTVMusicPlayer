@@ -21,12 +21,12 @@ import okhttp3.Response;
 /**
  * Created by yangshuai on 2018/9/24.
  *
- * @Description: 歌单回调接口
+ * @Description: 获取多条的歌单回调接口
  */
 
-public class PlayListCallBack extends BaseCallBack {
+public class PlayListsCallBack extends BaseCallBack {
 
-    public PlayListCallBack(MainFragment mainFragment) {
+    public PlayListsCallBack(MainFragment mainFragment) {
         super(mainFragment, PlayList.class);
     }
 

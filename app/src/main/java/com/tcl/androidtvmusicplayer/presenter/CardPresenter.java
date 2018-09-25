@@ -1,12 +1,9 @@
 package com.tcl.androidtvmusicplayer.presenter;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.PageRow;
 import android.support.v17.leanback.widget.Presenter;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
@@ -53,29 +50,26 @@ public class CardPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+        ImageCardView cardView = (ImageCardView) viewHolder.view;
+        String titleText = null;
+        String picUrl = null;
         if (item instanceof PlayList) {
             PlayList playList = (PlayList) item;
-            ImageCardView cardView = (ImageCardView) viewHolder.view;
-
-            Log.d(TAG, "onBindViewHolder: ");
-            if (playList.getCoverImgUrl() != null) {
-                cardView.setTitleText(playList.getName());
-                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-                Glide.with(viewHolder.view.getContext()).load(playList.getCoverImgUrl())
-                        .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
-            }
+            titleText = playList.getName();
+            picUrl = playList.getCoverImgUrl();
         }
 
         if (item instanceof Artist) {
             Artist artist = (Artist) item;
-            ImageCardView cardView = (ImageCardView) viewHolder.view;
-            Log.d(TAG, "onBindViewHolder: ");
-            if (artist.getPicUrl() != null) {
-                cardView.setTitleText(artist.getName());
-                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-                Glide.with(viewHolder.view.getContext()).load(artist.getPicUrl())
-                        .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
-            }
+            titleText = artist.getName();
+            picUrl = artist.getPicUrl();
+        }
+
+        if (picUrl != null) {
+            cardView.setTitleText(titleText);
+            cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
+            Glide.with(viewHolder.view.getContext()).load(picUrl)
+                    .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
         }
 
     }
