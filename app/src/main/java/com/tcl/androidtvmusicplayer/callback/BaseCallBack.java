@@ -31,11 +31,7 @@ public class BaseCallBack implements Callback {
     protected JsonObject object;
     protected List list;
 
-
-    protected MainFragment fragment;
-
-    public <T> BaseCallBack(MainFragment fragment, Class<T> tClass) {
-        this.fragment = fragment;
+    public <T> BaseCallBack(Class<T> tClass) {
         list = new ArrayList<T>();
     }
 

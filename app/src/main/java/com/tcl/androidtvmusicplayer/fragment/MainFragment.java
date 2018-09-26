@@ -80,7 +80,7 @@ public class MainFragment extends BrowseFragment {
         for (int i = 1; i <= 23; i++) {
             HttpUtils.doGetRequest(Constants.TOP_LIST + i, topListCallBack);
         }
-        HttpUtils.doGetRequest(Constants.ARTIST, new ArtistCallBack(this));
+        HttpUtils.doGetRequest(Constants.ARTISTS, new ArtistCallBack(this));
     }
 
 
@@ -146,11 +146,14 @@ public class MainFragment extends BrowseFragment {
 
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
+            Intent intent = new Intent(getActivity(), PlayListActivity.class);
             if (item instanceof PlayList) {
-                Intent intent = new Intent(getActivity(), PlayListActivity.class);
-                intent.putExtra(Constants.PLAYLIST,((PlayList) item).getId());
-                startActivity(intent);
+                intent.putExtra(Constants.PLAYLIST, ((PlayList) item).getId());
             }
+            if (item instanceof Artist) {
+                intent.putExtra(Constants.ARTIST, ((Artist) item).getId());
+            }
+            startActivity(intent);
         }
     }
 

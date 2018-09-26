@@ -17,9 +17,11 @@ import okhttp3.Response;
  */
 
 public class TopListCallBack extends BaseCallBack {
+    MainFragment mainFragment;
 
     public TopListCallBack(MainFragment fragment) {
-        super(fragment, PlayList.class);
+        super(PlayList.class);
+        mainFragment = fragment;
     }
 
     @Override
@@ -29,10 +31,10 @@ public class TopListCallBack extends BaseCallBack {
         final PlayList topList = gson.fromJson(element, PlayList.class);
         list.add(topList);
         if (list.size() == 23) {
-            fragment.getActivity().runOnUiThread(new Runnable() {
+            mainFragment.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    fragment.loadRows(list, 1, "排行榜");
+                    mainFragment.loadRows(list, 1, "排行榜");
                 }
             });
         }

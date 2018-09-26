@@ -23,9 +23,11 @@ import okhttp3.Response;
  */
 
 public class ArtistCallBack extends BaseCallBack {
+    MainFragment mainFragment;
 
     public ArtistCallBack(MainFragment mainFragment) {
-        super(mainFragment, Artist.class);
+        super(Artist.class);
+        this.mainFragment = mainFragment;
     }
 
     @Override
@@ -36,10 +38,10 @@ public class ArtistCallBack extends BaseCallBack {
         for (JsonElement element : jsonArray) {
             list.add(gson.fromJson(element, Artist.class));
         }
-        fragment.getActivity().runOnUiThread(new Runnable() {
+        mainFragment.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                fragment.loadRows(list, 2, "歌手榜");
+                mainFragment.loadRows(list, 2, "歌手榜");
             }
         });
     }

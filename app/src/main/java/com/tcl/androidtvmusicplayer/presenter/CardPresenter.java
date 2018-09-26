@@ -10,6 +10,9 @@ import com.bumptech.glide.Glide;
 import com.tcl.androidtvmusicplayer.R;
 import com.tcl.androidtvmusicplayer.entity.Artist;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
+import com.tcl.androidtvmusicplayer.entity.Song;
+
+import java.util.List;
 
 /**
  * Created by yangshuai on 2018/9/23.
@@ -53,6 +56,7 @@ public class CardPresenter extends Presenter {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         String titleText = null;
         String picUrl = null;
+        String contentText = null;
         if (item instanceof PlayList) {
             PlayList playList = (PlayList) item;
             titleText = playList.getName();
@@ -65,8 +69,22 @@ public class CardPresenter extends Presenter {
             picUrl = artist.getPicUrl();
         }
 
+        if (item instanceof Song) {
+            contentText = new String(" ");
+            titleText = ((Song) item).getName();
+            picUrl = ((Song) item).getAlbum().getPicUrl();
+            List<Artist> artistList = ((Song) item).getArtists();
+            for (Artist artist : artistList
+                    ) {
+                contentText += artist.getName() + " ";
+            }
+        }
+
         if (picUrl != null) {
             cardView.setTitleText(titleText);
+            if (contentText != null) {
+                cardView.setContentText(contentText);
+            }
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             Glide.with(viewHolder.view.getContext()).load(picUrl)
                     .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());

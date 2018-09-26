@@ -14,7 +14,6 @@ public class Artist {
     private int albumSize;//歌手专辑数量
     private int musicSize;//歌手音乐数量
 
-
     public Artist() {
     }
 
