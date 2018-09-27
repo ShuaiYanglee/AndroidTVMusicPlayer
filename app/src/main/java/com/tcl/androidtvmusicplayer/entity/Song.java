@@ -2,6 +2,7 @@ package com.tcl.androidtvmusicplayer.entity;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  * @Description: 歌曲
  */
 
-public class Song {
+public class Song implements Serializable{
 
     private String name;//歌曲名
     private long id;//歌曲ID

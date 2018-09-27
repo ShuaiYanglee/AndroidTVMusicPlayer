@@ -30,7 +30,8 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.PlayListActivity"></activity>
+        <activity android:name=".activity.PlayListActivity" />
+        <activity android:name=".activity.PlayActivity"></activity>
     </application>
 
 </manifest>

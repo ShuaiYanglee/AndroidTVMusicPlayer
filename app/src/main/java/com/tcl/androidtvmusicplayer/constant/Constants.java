@@ -34,4 +34,7 @@ public class Constants {
     //Intent传递的参数
     public static final String ARTIST = "artist";
 
+    //Intent传递的参数
+    public static final String SONG = "song";
+
 }

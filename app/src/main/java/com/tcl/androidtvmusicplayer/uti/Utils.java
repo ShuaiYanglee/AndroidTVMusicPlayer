@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 /**
  * Created by yangshuai on 2018/9/23.
@@ -27,5 +28,10 @@ public class Utils {
     public static int convertDpToPixel(Context context, int dp) {
         float density = context.getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+
+    public static void toast(Context context,String toastMessage){
+        Toast.makeText(context,toastMessage,Toast.LENGTH_SHORT).show();
     }
 }

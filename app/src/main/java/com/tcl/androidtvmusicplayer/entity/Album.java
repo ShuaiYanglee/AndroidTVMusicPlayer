@@ -1,12 +1,14 @@
 package com.tcl.androidtvmusicplayer.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by yangshuai on 2018/9/25.
  *
  * @Description: 专辑
  */
 
-public class Album {
+public class Album implements Serializable{
 
     private long id;//专辑ID
     private String name;//专辑名

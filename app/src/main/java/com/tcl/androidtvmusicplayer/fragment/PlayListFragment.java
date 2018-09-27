@@ -1,5 +1,6 @@
 package com.tcl.androidtvmusicplayer.fragment;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.tcl.androidtvmusicplayer.R;
+import com.tcl.androidtvmusicplayer.activity.PlayActivity;
 import com.tcl.androidtvmusicplayer.callback.ArtistDetailCallBack;
 import com.tcl.androidtvmusicplayer.callback.PlayListCallBack;
 import com.tcl.androidtvmusicplayer.constant.Constants;
@@ -168,7 +170,12 @@ public class PlayListFragment extends VerticalGridFragment {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
             if (item instanceof Song) {
-                Toast.makeText(getActivity(), ((Song) item).getName(), Toast.LENGTH_SHORT).show();
+                if (item instanceof Song){
+                    Song song = (Song) item;
+                    Intent intent = new Intent(getContext(), PlayActivity.class);
+                    intent.putExtra(Constants.SONG,song);
+                    startActivity(intent);
+                }
             }
         }
     }
