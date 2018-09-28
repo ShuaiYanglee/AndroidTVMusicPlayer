@@ -28,6 +28,12 @@ public class Constants {
     //歌手详情
     public static final String ARTIST_DETAIL = SERVER_HOST + "artists?id=";
 
+
+    //歌曲URL
+    //public static final String SONG_URL = SERVER_HOST+"music/url?id=";
+
+    public static final String SONG_URL = "http://music.163.com/song/media/outer/url?id=";
+
     //Intent传递的参数
     public static final String PLAYLIST = "playlist";
 

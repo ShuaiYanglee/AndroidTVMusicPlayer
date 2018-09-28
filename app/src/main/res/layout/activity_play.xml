@@ -1,16 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/rl_play">
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layout_above="@+id/ll_control"
+       android:orientation="horizontal">
+       <ImageView
+           android:layout_width="200dp"
+           android:layout_height="200dp"
+           android:src="@drawable/ic_app_logo"
+           android:id="@+id/iv_song_pic"
+           android:layout_weight="1"
+           android:layout_gravity="center"/>
+       <LinearLayout
+           android:layout_width="0dp"
+           android:layout_height="150dp"
+           android:layout_gravity="top"
+           android:orientation="horizontal"
+           android:gravity="center"
+           android:layout_weight="1">
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/tv_song_name"
+               android:layout_weight="1"
+               android:text="纸短情长"
+               android:textSize="30sp"/>
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/tv_song_artists"
+               android:layout_weight="1"
+               android:text="花粥"
+               android:textSize="30sp"/>
+       </LinearLayout>
+
+   </LinearLayout>
+
+
+
     
     
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:layout_margin="20dp">
+        android:layout_margin="40dp"
+        android:id="@+id/ll_control">
 
 
         <ImageButton
@@ -34,7 +79,7 @@
             android:layout_height="match_parent"
             android:id="@+id/image_button_pause"
             android:layout_weight="1"
-            android:src="@drawable/ic_pause_selector"
+            android:src="@drawable/ic_play_selector"
             android:background="#00000000"/>
 
         <ImageButton
@@ -52,8 +97,18 @@
             android:src="@drawable/ic_next_selector"
             android:background="#00000000"/>
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_list_repeat_selector"
+            android:background="#00000000"
+            android:id="@+id/image_button_list_repeat_mode"/>
+
 
     </LinearLayout>
+
+
     
     
-</LinearLayout>
+</RelativeLayout>

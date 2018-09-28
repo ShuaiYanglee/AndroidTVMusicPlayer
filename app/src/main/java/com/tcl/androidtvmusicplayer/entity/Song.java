@@ -11,7 +11,7 @@ import java.util.List;
  * @Description: 歌曲
  */
 
-public class Song implements Serializable{
+public class Song implements Serializable {
 
     private String name;//歌曲名
     private long id;//歌曲ID
@@ -20,6 +20,11 @@ public class Song implements Serializable{
     private List<Artist> artists;//歌曲演唱者
     @SerializedName("al")
     private Album album;//歌曲所属专辑
+
+
+    private long size;//歌曲size
+
+    private String url;//歌曲URL
 
 
     public String getName() {
@@ -52,5 +57,30 @@ public class Song implements Serializable{
 
     public void setAlbum(Album album) {
         this.album = album;
+    }
+
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getArtistsName(){
+        String artistsName =" ";
+        for (Artist artist:artists) {
+            artistsName += artist.getName()+" ";
+        }
+        return artistsName;
     }
 }
