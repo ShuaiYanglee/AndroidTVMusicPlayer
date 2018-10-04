@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.tcl.androidtvmusicplayer.activity.PlayActivity;
 import com.tcl.androidtvmusicplayer.entity.Song;
+import com.tcl.androidtvmusicplayer.uti.Utils;
 
 import java.io.IOException;
 
@@ -16,23 +17,23 @@ import okhttp3.Response;
  * @Description:
  */
 
-public class SongDetailCallBack extends BaseCallBack {
-
-
+public class SongLyricCallBack extends BaseCallBack {
 
     PlayActivity playActivity;
-    public <T> SongDetailCallBack(PlayActivity playActivity) {
+    Song song;
+    public <T> SongLyricCallBack(PlayActivity playActivity,Song song) {
         super(Song.class);
         this.playActivity = playActivity;
+        this.song = song;
     }
 
 
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         super.onResponse(call, response);
-        JsonArray array = object.get("data").getAsJsonArray();
-        JsonElement element = array.get(0);
-        Song song = gson.fromJson(element,Song.class);
+        object = object.getAsJsonObject("lrc");
+        String lyric = object.get("lyric").getAsString();
+        song.setSongLyric(Utils.parseSongLyric(lyric));
         playActivity.initData(song);
     }
 }

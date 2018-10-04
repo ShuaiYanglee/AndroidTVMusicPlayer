@@ -34,6 +34,9 @@ public class Constants {
 
     public static final String SONG_URL = "http://music.163.com/song/media/outer/url?id=";
 
+
+    public static final String SONG_LYRIC = SERVER_HOST + "lyric?id=";
+
     //Intent传递的参数
     public static final String PLAYLIST = "playlist";
 

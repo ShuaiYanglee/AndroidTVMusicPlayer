@@ -1,114 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_play"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:id="@+id/rl_play">
+    android:orientation="vertical">
 
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:layout_above="@+id/ll_control"
-       android:orientation="horizontal">
-       <ImageView
-           android:layout_width="200dp"
-           android:layout_height="200dp"
-           android:src="@drawable/ic_app_logo"
-           android:id="@+id/iv_song_pic"
-           android:layout_weight="1"
-           android:layout_gravity="center"/>
-       <LinearLayout
-           android:layout_width="0dp"
-           android:layout_height="150dp"
-           android:layout_gravity="top"
-           android:orientation="horizontal"
-           android:gravity="center"
-           android:layout_weight="1">
-
-           <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:id="@+id/tv_song_name"
-               android:layout_weight="1"
-               android:text="纸短情长"
-               android:textSize="30sp"/>
-
-           <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:id="@+id/tv_song_artists"
-               android:layout_weight="1"
-               android:text="花粥"
-               android:textSize="30sp"/>
-       </LinearLayout>
-
-   </LinearLayout>
-
-
-
-    
-    
     <LinearLayout
+        android:id="@+id/ll_song_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_weight="4"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_song_pic"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:src="@drawable/ic_app_logo" />
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_song_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="1"
+                android:text="纸短情长"
+                android:textColor="#434443"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/tv_song_artists"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_song_name"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="1"
+                android:text="花粥"
+                android:textColor="#434443"
+                android:textSize="20sp" />
+
+            <me.wcy.lrcview.LrcView
+                android:id="@+id/lrc_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tv_song_artists" />
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/song_seek_bar"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="80dp"
+            android:maxHeight="40dp"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_control"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:layout_margin="40dp"
-        android:id="@+id/ll_control">
+        android:layout_below="@id/ll_play"
+        android:layout_margin="20dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:id="@+id/image_button_pre"
-            android:layout_weight="1"
-            android:src="@drawable/ic_pre_selector"
-            android:background="#00000000"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/image_button_skip_left"
-            android:layout_weight="1"
-            android:src="@drawable/ic_skip_left_selector"
-            android:background="#00000000"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/image_button_pause"
-            android:layout_weight="1"
-            android:src="@drawable/ic_play_selector"
-            android:background="#00000000"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/image_button_skip_right"
-            android:layout_weight="1"
-            android:src="@drawable/ic_skip_right_selector"
-            android:background="#00000000"/>
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/image_button_next"
-            android:layout_weight="1"
-            android:src="@drawable/ic_next_selector"
-            android:background="#00000000"/>
-
-        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:src="@drawable/ic_list_repeat_selector"
             android:background="#00000000"
-            android:id="@+id/image_button_list_repeat_mode"/>
+            android:src="@drawable/ic_pre_selector" />
+
+        <ImageButton
+            android:id="@+id/image_button_skip_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:src="@drawable/ic_skip_left_selector" />
+
+        <ImageButton
+            android:id="@+id/image_button_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:src="@drawable/ic_play_selector" />
+
+        <ImageButton
+            android:id="@+id/image_button_skip_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:src="@drawable/ic_skip_right_selector" />
+
+        <ImageButton
+            android:id="@+id/image_button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:src="@drawable/ic_next_selector" />
+
+        <ImageButton
+            android:id="@+id/image_button_list_repeat_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:src="@drawable/ic_list_repeat_selector" />
 
 
     </LinearLayout>
 
 
-    
-    
-</RelativeLayout>
+</LinearLayout>

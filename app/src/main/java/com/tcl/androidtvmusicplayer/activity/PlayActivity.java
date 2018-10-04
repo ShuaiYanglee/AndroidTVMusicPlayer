@@ -1,34 +1,29 @@
 package com.tcl.androidtvmusicplayer.activity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
-import android.support.v17.leanback.widget.GuidedActionAdapter;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v17.leanback.app.BackgroundManager;
+
+
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.tcl.androidtvmusicplayer.GlideApp;
 import com.tcl.androidtvmusicplayer.R;
-import com.tcl.androidtvmusicplayer.callback.SongDetailCallBack;
+import com.tcl.androidtvmusicplayer.callback.SongLyricCallBack;
 import com.tcl.androidtvmusicplayer.constant.Constants;
 import com.tcl.androidtvmusicplayer.entity.Song;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
@@ -36,10 +31,14 @@ import com.tcl.androidtvmusicplayer.uti.Utils;
 
 import java.io.IOException;
 
+import jp.wasabeef.glide.transformations.BlurTransformation;
+import me.wcy.lrcview.LrcView;
+
 
 public class PlayActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "PlayActivity";
+    private static final MediaPlayer mediaPlayer = new MediaPlayer();
 
     ImageButton btnPre;
     ImageButton btnNext;
@@ -50,11 +49,13 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     TextView tvSongName;
     TextView tvSongArtists;
     ImageView ivSongPic;
+    SeekBar songSeekBar;
+    LrcView lrcView;
 
-
-    MediaPlayer mediaPlayer = new MediaPlayer();
+    BackgroundManager manager;
     String songUrl;
     Song song;
+    Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,23 +64,29 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         song = (Song) getIntent().getSerializableExtra(Constants.SONG);
         songUrl = Constants.SONG_URL + song.getId() + ".mp3";
         song.setUrl(songUrl);
-        //HttpUtils.doGetRequest(Constants.SONG_URL+song.getId(),new SongDetailCallBack(this));
+        //HttpUtils.doGetRequest(Constants.SONG_URL+song.getId(),new SongLyricCallBack(this));
+        HttpUtils.doGetRequest(Constants.SONG_LYRIC+song.getId(),new SongLyricCallBack(this,song));
         initView();
-        initData(song);
 
     }
 
-    public void initData(Song song) {
+    public void initData(final Song song) {
         try {
+            mediaPlayer.reset();
             mediaPlayer.setDataSource(song.getUrl());
+            song.getSongLyric();
+            lrcView.loadLrc(song.getSongLyric());
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     Utils.toast(PlayActivity.this, "准备完毕");
                     btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_selector));
-                    mediaPlayer.start();
+                    songSeekBar.setMax(mediaPlayer.getDuration());
+                    songSeekBar.setProgress(0);
+                    btnPause.performClick();
                 }
             });
+            
             mediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
@@ -93,30 +100,27 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         btnSkipLeft = findViewById(R.id.image_button_skip_left);
         btnSkipRight = findViewById(R.id.image_button_skip_right);
         btnListRepeatMode = findViewById(R.id.image_button_list_repeat_mode);
+        songSeekBar = findViewById(R.id.song_seek_bar);
         tvSongName = findViewById(R.id.tv_song_name);
         tvSongName.setText(song.getName());
         tvSongArtists = findViewById(R.id.tv_song_artists);
         tvSongArtists.setText(song.getArtistsName());
-
+        lrcView = findViewById(R.id.lrc_view);
+        manager = BackgroundManager.getInstance(this);
+        manager.attach(getWindow());
         ivSongPic = findViewById(R.id.iv_song_pic);
-        Glide.with(this).load(song.getAlbum().getPicUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
+
+        GlideApp.with(this).load(song.getAlbum().getPicUrl()).circleCrop().into(ivSongPic);
+        GlideApp.with(this).load(song.getAlbum().getPicUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15,3))).into(new SimpleTarget<Drawable>() {
             @Override
-            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(),resource);
-                roundedBitmapDrawable.setCornerRadius(resource.getWidth()/2);
-                roundedBitmapDrawable.setAntiAlias(true);
-                ivSongPic.setImageDrawable(roundedBitmapDrawable);
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                manager.setDrawable(resource);
             }
         });
-
-        /*btnPre.setAlpha(50);
-        btnNext.setAlpha(50);
-        btnPause.setAlpha(50);
-        btnSkipLeft.setAlpha(50);
-        btnSkipRight.setAlpha(50);*/
         btnPre.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnPause.setOnClickListener(this);
+        btnPause.setFocusedByDefault(true);
         btnSkipLeft.setOnClickListener(this);
         btnSkipRight.setOnClickListener(this);
         btnListRepeatMode.setOnClickListener(this);
@@ -137,9 +141,11 @@ public class PlayActivity extends Activity implements View.OnClickListener {
                 if (!mediaPlayer.isPlaying()) {
                     mediaPlayer.start();
                     btnPause.setImageDrawable(getDrawable(R.drawable.ic_pause_selector));
+                    handler.post(runnable);
                 } else {
                     mediaPlayer.pause();
                     btnPause.setImageDrawable(getDrawable(R.drawable.ic_play_selector));
+                    handler.removeCallbacks(runnable);
                 }
                 break;
             default:
@@ -149,4 +155,22 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     }
 
 
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mediaPlayer.isPlaying()) {
+                long time = mediaPlayer.getCurrentPosition();
+                lrcView.updateTime(time);
+                songSeekBar.setProgress((int) time);
+            }
+
+            handler.postDelayed(this, 300);
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 }

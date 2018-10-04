@@ -26,6 +26,8 @@ public class Song implements Serializable {
 
     private String url;//歌曲URL
 
+    private String songLyric;//歌曲歌词
+
 
     public String getName() {
         return name;
@@ -82,5 +84,14 @@ public class Song implements Serializable {
             artistsName += artist.getName()+" ";
         }
         return artistsName;
+    }
+
+
+    public String getSongLyric() {
+        return songLyric;
+    }
+
+    public void setSongLyric(String songLyric) {
+        this.songLyric = songLyric;
     }
 }

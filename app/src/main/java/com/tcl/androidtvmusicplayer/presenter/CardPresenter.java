@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.tcl.androidtvmusicplayer.GlideApp;
 import com.tcl.androidtvmusicplayer.R;
 import com.tcl.androidtvmusicplayer.entity.Artist;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
@@ -86,8 +87,9 @@ public class CardPresenter extends Presenter {
                 cardView.setContentText(contentText);
             }
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-            Glide.with(viewHolder.view.getContext()).load(picUrl)
+            GlideApp.with(viewHolder.view.getContext()).load(picUrl)
                     .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());
+
         }
 
     }

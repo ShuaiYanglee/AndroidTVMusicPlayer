@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.tcl.androidtvmusicplayer"
         minSdkVersion 26
@@ -17,12 +17,20 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.google.com' }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:leanback-v17:26.1.0'
+    implementation 'com.android.support:leanback-v17:27.1.1'
     implementation 'com.squareup.okhttp3:okhttp:3.5.0'//okhttp网络通信
     implementation 'com.google.code.gson:gson:2.7'//gson用作json解析
-    implementation 'com.github.bumptech.glide:glide:3.8.0'//glide图片加载
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'//glide图片加载
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    implementation 'jp.wasabeef:glide-transformations:3.3.0'//glide 变换库
+    implementation 'me.wcy:lrcview:2.0.0'//歌词控件库
+    implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }
