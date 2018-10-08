@@ -1,9 +1,12 @@
 package com.tcl.androidtvmusicplayer.callback;
 
+import android.os.Binder;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.tcl.androidtvmusicplayer.activity.PlayActivity;
 import com.tcl.androidtvmusicplayer.entity.Song;
+import com.tcl.androidtvmusicplayer.service.PlayService;
 import com.tcl.androidtvmusicplayer.uti.Utils;
 
 import java.io.IOException;
@@ -19,11 +22,11 @@ import okhttp3.Response;
 
 public class SongLyricCallBack extends BaseCallBack {
 
-    PlayActivity playActivity;
+    PlayService.MyBinder binder;
     Song song;
-    public <T> SongLyricCallBack(PlayActivity playActivity,Song song) {
+    public <T> SongLyricCallBack(PlayService.MyBinder binder, Song song) {
         super(Song.class);
-        this.playActivity = playActivity;
+        this.binder = binder;
         this.song = song;
     }
 
@@ -34,6 +37,6 @@ public class SongLyricCallBack extends BaseCallBack {
         object = object.getAsJsonObject("lrc");
         String lyric = object.get("lyric").getAsString();
         song.setSongLyric(Utils.parseSongLyric(lyric));
-        playActivity.initData(song);
+        binder.playMusic();
     }
 }

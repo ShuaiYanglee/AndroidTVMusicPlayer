@@ -32,6 +32,7 @@
         </activity>
         <activity android:name=".activity.PlayListActivity" />
         <activity android:name=".activity.PlayActivity"></activity>
+        <service android:name=".service.PlayService"/>
     </application>
 
 </manifest>

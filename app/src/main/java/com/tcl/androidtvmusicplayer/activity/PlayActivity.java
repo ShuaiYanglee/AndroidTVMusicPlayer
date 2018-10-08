@@ -1,11 +1,15 @@
 package com.tcl.androidtvmusicplayer.activity;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
@@ -18,18 +22,20 @@ import android.widget.ImageView;
 
 import android.widget.SeekBar;
 import android.widget.TextView;
+
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.tcl.androidtvmusicplayer.GlideApp;
 import com.tcl.androidtvmusicplayer.R;
-import com.tcl.androidtvmusicplayer.callback.SongLyricCallBack;
+
 import com.tcl.androidtvmusicplayer.constant.Constants;
 import com.tcl.androidtvmusicplayer.entity.Song;
-import com.tcl.androidtvmusicplayer.uti.HttpUtils;
+import com.tcl.androidtvmusicplayer.service.PlayService;
+
 import com.tcl.androidtvmusicplayer.uti.Utils;
 
-import java.io.IOException;
+import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import me.wcy.lrcview.LrcView;
@@ -38,12 +44,9 @@ import me.wcy.lrcview.LrcView;
 public class PlayActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "PlayActivity";
-    private static final MediaPlayer mediaPlayer = new MediaPlayer();
 
     ImageButton btnPre;
     ImageButton btnNext;
-    ImageButton btnSkipLeft;
-    ImageButton btnSkipRight;
     ImageButton btnPause;
     ImageButton btnListRepeatMode;
     TextView tvSongName;
@@ -53,100 +56,117 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     LrcView lrcView;
 
     BackgroundManager manager;
-    String songUrl;
+    PlayService.MyBinder binder;
     Song song;
-    Handler handler = new Handler();
+    List<Song> songList;
+    MediaPlayer player;
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Constants.MSG_MUSIC_INIT:
+                    Utils.toast(PlayActivity.this, "准备完毕");
+                    updateView(binder.getCurrentSong());
+                    btnPause.performClick();
+                    break;
+                case Constants.MSG_MUSIC_START:
+                    btnPause.setImageDrawable(getDrawable(R.drawable.ic_pause_selector));
+                    handler.post(runnable);
+                    break;
+                case Constants.MSG_MUSIC_PAUSE:
+                    btnPause.setImageDrawable(getDrawable(R.drawable.ic_play_selector));
+                    handler.removeCallbacks(runnable);
+                    break;
+                default:
+                    break;
+
+
+            }
+        }
+    };
+
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            binder = (PlayService.MyBinder) service;
+            binder.setHandler(handler);
+            binder.initData(song);
+            binder.setSongList(songList);
+            player = binder.getMediaPlayer();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-        song = (Song) getIntent().getSerializableExtra(Constants.SONG);
-        songUrl = Constants.SONG_URL + song.getId() + ".mp3";
-        song.setUrl(songUrl);
-        //HttpUtils.doGetRequest(Constants.SONG_URL+song.getId(),new SongLyricCallBack(this));
-        HttpUtils.doGetRequest(Constants.SONG_LYRIC+song.getId(),new SongLyricCallBack(this,song));
+        Intent intent = new Intent(this, PlayService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
+        Bundle bundle = getIntent().getBundleExtra(Constants.BUNDLE);
+        song = (Song) bundle.getSerializable(Constants.SONG);
+        songList = (List<Song>) bundle.getSerializable(Constants.SONG_LIST);
         initView();
 
     }
 
-    public void initData(final Song song) {
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(song.getUrl());
-            song.getSongLyric();
-            lrcView.loadLrc(song.getSongLyric());
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    Utils.toast(PlayActivity.this, "准备完毕");
-                    btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_selector));
-                    songSeekBar.setMax(mediaPlayer.getDuration());
-                    songSeekBar.setProgress(0);
-                    btnPause.performClick();
-                }
-            });
-            
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    //界面初始化时加载的View
     private void initView() {
         btnPre = findViewById(R.id.image_button_pre);
         btnNext = findViewById(R.id.image_button_next);
         btnPause = findViewById(R.id.image_button_pause);
-        btnSkipLeft = findViewById(R.id.image_button_skip_left);
-        btnSkipRight = findViewById(R.id.image_button_skip_right);
         btnListRepeatMode = findViewById(R.id.image_button_list_repeat_mode);
         songSeekBar = findViewById(R.id.song_seek_bar);
         tvSongName = findViewById(R.id.tv_song_name);
-        tvSongName.setText(song.getName());
         tvSongArtists = findViewById(R.id.tv_song_artists);
-        tvSongArtists.setText(song.getArtistsName());
         lrcView = findViewById(R.id.lrc_view);
-        manager = BackgroundManager.getInstance(this);
-        manager.attach(getWindow());
         ivSongPic = findViewById(R.id.iv_song_pic);
 
+        manager = BackgroundManager.getInstance(this);
+        manager.attach(getWindow());
+
+        btnPre.setOnClickListener(this);
+        btnNext.setOnClickListener(this);
+        btnPause.setOnClickListener(this);
+        btnPause.setFocusedByDefault(true);
+        btnListRepeatMode.setOnClickListener(this);
+    }
+
+    //音乐数据准备完后更新界面
+    public void updateView(Song song) {
+        tvSongName.setText(song.getName());
+        tvSongArtists.setText(song.getArtistsName());
         GlideApp.with(this).load(song.getAlbum().getPicUrl()).circleCrop().into(ivSongPic);
-        GlideApp.with(this).load(song.getAlbum().getPicUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15,3))).into(new SimpleTarget<Drawable>() {
+        GlideApp.with(this).load(song.getAlbum().getPicUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15, 3))).into(new SimpleTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 manager.setDrawable(resource);
             }
         });
-        btnPre.setOnClickListener(this);
-        btnNext.setOnClickListener(this);
-        btnPause.setOnClickListener(this);
-        btnPause.setFocusedByDefault(true);
-        btnSkipLeft.setOnClickListener(this);
-        btnSkipRight.setOnClickListener(this);
-        btnListRepeatMode.setOnClickListener(this);
+
+        btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_selector));
+        songSeekBar.setMax(player.getDuration());
+        songSeekBar.setProgress(0);
+        lrcView.loadLrc(song.getSongLyric());
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.image_button_pre:
-                Utils.toast(this, "上一首");
-                Log.d(TAG, "onClick: " + "上一首");
+                binder.playNext();
                 break;
             case R.id.image_button_next:
-                Utils.toast(this, "下一首");
-                Log.d(TAG, "onClick: " + "下一首");
+                binder.playNext();
                 break;
             case R.id.image_button_pause:
-                if (!mediaPlayer.isPlaying()) {
-                    mediaPlayer.start();
-                    btnPause.setImageDrawable(getDrawable(R.drawable.ic_pause_selector));
-                    handler.post(runnable);
-                } else {
-                    mediaPlayer.pause();
-                    btnPause.setImageDrawable(getDrawable(R.drawable.ic_play_selector));
-                    handler.removeCallbacks(runnable);
-                }
+                binder.play();
                 break;
             default:
                 Utils.toast(this, "default message");
@@ -158,12 +178,11 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if (mediaPlayer.isPlaying()) {
-                long time = mediaPlayer.getCurrentPosition();
+            if (player.isPlaying()) {
+                long time = player.getCurrentPosition();
                 lrcView.updateTime(time);
                 songSeekBar.setProgress((int) time);
             }
-
             handler.postDelayed(this, 300);
         }
     };
@@ -171,6 +190,8 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        unbindService(connection);
     }
+
+
 }

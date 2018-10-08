@@ -8,9 +8,9 @@ package com.tcl.androidtvmusicplayer.constant;
 
 public class Constants {
     //音乐服务器IP
-    public static final String SERVER_HOST = "http://192.168.0.102:3000/";
+    //public static final String SERVER_HOST = "http://192.168.0.102:3000/";
 
-    //public static final String SERVER_HOST ="http://10.120.5.25:3000/";
+    public static final String SERVER_HOST = "http://10.120.5.25:3000/";
 
 
     //华语热门歌单
@@ -45,5 +45,15 @@ public class Constants {
 
     //Intent传递的参数
     public static final String SONG = "song";
+
+    public static final String SONG_LIST = "songList";
+
+    public static final String BUNDLE = "bundle";
+
+    public static final int MSG_MUSIC_INIT = 0;
+
+    public static final int MSG_MUSIC_START = 1;
+
+    public static final int MSG_MUSIC_PAUSE = 2;
 
 }

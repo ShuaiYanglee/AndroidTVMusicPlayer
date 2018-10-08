@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
@@ -31,6 +32,8 @@ import com.tcl.androidtvmusicplayer.entity.Song;
 import com.tcl.androidtvmusicplayer.presenter.CardPresenter;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,6 +59,7 @@ public class PlayListFragment extends VerticalGridFragment {
     private static final int BACKGROUND_UPDATE_DELAY = 300;
 
     private static final String TAG = "PlayListFragment";
+    private List<Song> songList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +114,7 @@ public class PlayListFragment extends VerticalGridFragment {
     }
 
     public void loadRows(List<Song> songList) {
+        this.songList = songList;
         adapter.addAll(0, songList);
         adapter.notifyItemRangeChanged(0, 1);
         startEntranceTransition();
@@ -119,18 +124,12 @@ public class PlayListFragment extends VerticalGridFragment {
     protected void updateBackground(String uri) {
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
-        GlideApp.with(getActivity()).load(uri).centerCrop().error(defaultBackground).into(new SimpleTarget<Drawable>(width,height) {
+        GlideApp.with(getActivity()).load(uri).centerCrop().error(defaultBackground).into(new SimpleTarget<Drawable>(width, height) {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 backgroundManager.setDrawable(resource);
             }
         });
-        /*Glide.with(getActivity()).load(uri).centerCrop().error(defaultBackground).into(new SimpleTarget<GlideDrawable>(width, height) {
-            @Override
-            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                backgroundManager.setDrawable(resource);
-            }
-        });*/
         backgroundTimer.cancel();
     }
 
@@ -171,14 +170,16 @@ public class PlayListFragment extends VerticalGridFragment {
 
     private class ItemViewClickedListener implements OnItemViewClickedListener {
 
-        //todo 点击进入音乐播放
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
             if (item instanceof Song) {
-                if (item instanceof Song){
+                if (item instanceof Song) {
                     Song song = (Song) item;
                     Intent intent = new Intent(getContext(), PlayActivity.class);
-                    intent.putExtra(Constants.SONG,song);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(Constants.SONG_LIST, (Serializable) songList);
+                    bundle.putSerializable(Constants.SONG, song);
+                    intent.putExtra(Constants.BUNDLE, bundle);
                     startActivity(intent);
                 }
             }
