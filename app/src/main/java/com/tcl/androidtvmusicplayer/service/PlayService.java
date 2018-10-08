@@ -39,8 +39,9 @@ public class PlayService extends Service {
         private Handler handler;
         private List<Song> songList;
         private Song currentSong;
+        private int currentMode = 0;
 
-        public void initData(Song song){
+        public void initData(Song song) {
             setCurrentSong(song);
             String songUrl = Constants.SONG_URL + currentSong.getId() + ".mp3";
             currentSong.setUrl(songUrl);
@@ -62,7 +63,7 @@ public class PlayService extends Service {
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        initData(songList.iterator().next());
+                        playNext();
                     }
                 });
             } catch (IOException e) {
@@ -70,14 +71,42 @@ public class PlayService extends Service {
             }
         }
 
-        public void playNext(){
-            Collections.shuffle(songList);
-            Random random = new Random();
-            initData(songList.get(random.nextInt(songList.size())));
+        public void playNext() {
+            int index = songList.indexOf(currentSong);
+            int nextIndex = (index + 1) % songList.size();
+            switch (getCurrentMode()) {
+                case Constants.MODE_REPEAT_LIST:
+                    initData(songList.get(nextIndex));
+                    break;
+                case Constants.MODE_REPEAT_SINGLE:
+                    initData(songList.get(index));
+                    break;
+                case Constants.MODE_REPEAT_RANDOM:
+                    Random random = new Random();
+                    initData(songList.get(random.nextInt(songList.size())));
+                    break;
+                case Constants.MODE_REPEAT_SEQUENCE:
+                    if (nextIndex == 0) {
+                        player.release();
+                    } else {
+                        initData(songList.get(nextIndex));
+                    }
+                    break;
+            }
         }
 
 
-        public void play(){
+        public void setPlayMode() {
+            currentMode = (currentMode + 1) % 4;
+            handler.sendEmptyMessage(Constants.MSG_UPDATE_PLAY_MODE);
+        }
+
+        public int getCurrentMode() {
+            return currentMode;
+        }
+
+
+        public void play() {
             if (!player.isPlaying()) {
                 player.start();
                 handler.sendEmptyMessage(Constants.MSG_MUSIC_START);
@@ -87,23 +116,23 @@ public class PlayService extends Service {
             }
         }
 
-        public void setCurrentSong(Song song){
+        public void setCurrentSong(Song song) {
             currentSong = song;
         }
 
-        public Song getCurrentSong(){
+        public Song getCurrentSong() {
             return currentSong;
         }
 
-        public void setSongList(List<Song> songList){
-            this.songList =songList;
+        public void setSongList(List<Song> songList) {
+            this.songList = songList;
         }
 
-        public void setHandler(Handler handler){
+        public void setHandler(Handler handler) {
             this.handler = handler;
         }
 
-        public MediaPlayer getMediaPlayer(){
+        public MediaPlayer getMediaPlayer() {
             return player;
         }
 

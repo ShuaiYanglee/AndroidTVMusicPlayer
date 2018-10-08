@@ -78,6 +78,9 @@ public class PlayActivity extends Activity implements View.OnClickListener {
                     btnPause.setImageDrawable(getDrawable(R.drawable.ic_play_selector));
                     handler.removeCallbacks(runnable);
                     break;
+                case Constants.MSG_UPDATE_PLAY_MODE:
+                    updatePlayMode(binder.getCurrentMode());
+                    break;
                 default:
                     break;
 
@@ -92,8 +95,8 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         public void onServiceConnected(ComponentName name, IBinder service) {
             binder = (PlayService.MyBinder) service;
             binder.setHandler(handler);
-            binder.initData(song);
             binder.setSongList(songList);
+            binder.initData(song);
             player = binder.getMediaPlayer();
         }
 
@@ -168,8 +171,8 @@ public class PlayActivity extends Activity implements View.OnClickListener {
             case R.id.image_button_pause:
                 binder.play();
                 break;
-            default:
-                Utils.toast(this, "default message");
+            case R.id.image_button_list_repeat_mode:
+                binder.setPlayMode();
                 break;
         }
     }
@@ -191,6 +194,24 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
         unbindService(connection);
+    }
+
+
+    private void updatePlayMode(int playMode) {
+        switch (playMode) {
+            case Constants.MODE_REPEAT_LIST:
+                btnListRepeatMode.setImageDrawable(getDrawable(R.drawable.ic_repeat_list_selector));
+                break;
+            case Constants.MODE_REPEAT_SINGLE:
+                btnListRepeatMode.setImageDrawable(getDrawable(R.drawable.ic_repeat_single_selector));
+                break;
+            case Constants.MODE_REPEAT_RANDOM:
+                btnListRepeatMode.setImageDrawable(getDrawable(R.drawable.ic_repeat_random_selector));
+                break;
+            case Constants.MODE_REPEAT_SEQUENCE:
+                btnListRepeatMode.setImageDrawable(getDrawable(R.drawable.ic_repeat_sequence_selector));
+                break;
+        }
     }
 
 

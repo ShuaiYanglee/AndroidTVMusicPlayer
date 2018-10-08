@@ -56,4 +56,12 @@ public class Constants {
 
     public static final int MSG_MUSIC_PAUSE = 2;
 
+    public static final int MSG_UPDATE_PLAY_MODE = 3;
+
+    //播放模式
+    public static final int MODE_REPEAT_LIST = 0;
+    public static final int MODE_REPEAT_SINGLE = 1;
+    public static final int MODE_REPEAT_RANDOM = 2;
+    public static final int MODE_REPEAT_SEQUENCE = 3;
+
 }

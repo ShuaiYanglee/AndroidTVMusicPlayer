@@ -121,7 +121,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#00000000"
-            android:src="@drawable/ic_list_repeat_selector" />
+            android:src="@drawable/ic_repeat_list_selector" />
 
 
     </LinearLayout>

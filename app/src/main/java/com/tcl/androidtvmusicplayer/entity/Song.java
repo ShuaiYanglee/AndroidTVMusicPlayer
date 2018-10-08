@@ -78,10 +78,10 @@ public class Song implements Serializable {
         this.url = url;
     }
 
-    public String getArtistsName(){
-        String artistsName =" ";
-        for (Artist artist:artists) {
-            artistsName += artist.getName()+" ";
+    public String getArtistsName() {
+        String artistsName = " ";
+        for (Artist artist : artists) {
+            artistsName += artist.getName() + " ";
         }
         return artistsName;
     }
@@ -93,5 +93,14 @@ public class Song implements Serializable {
 
     public void setSongLyric(String songLyric) {
         this.songLyric = songLyric;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Song) {
+            if (this.getId() == ((Song) obj).getId())
+                return true;
+        }
+        return super.equals(obj);
     }
 }
