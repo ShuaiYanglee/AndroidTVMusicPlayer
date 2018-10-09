@@ -1,12 +1,18 @@
 package com.tcl.androidtvmusicplayer.fragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
@@ -37,6 +43,7 @@ import com.tcl.androidtvmusicplayer.constant.Constants;
 import com.tcl.androidtvmusicplayer.entity.Artist;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
 import com.tcl.androidtvmusicplayer.presenter.CardPresenter;
+import com.tcl.androidtvmusicplayer.service.PlayService;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
 import com.tcl.androidtvmusicplayer.uti.Utils;
 
@@ -65,6 +72,24 @@ public class MainFragment extends BrowseFragment {
     private Timer backgroundTimer;//背景切换计时器
     private BackgroundManager backgroundManager;//背景管理
 
+    PlayService.MyBinder binder;
+    PlayList localPlayList = new PlayList();
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            binder = (PlayService.MyBinder) service;
+            binder.setHandler(handler);
+            binder.setSongList(localPlayList.getSongList());
+            binder.initData(localPlayList.getSongList().get(0));
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +99,8 @@ public class MainFragment extends BrowseFragment {
         prepareBackgroundManager();
         initAdapter();
         setupEventListener();
+        Intent intent = new Intent(this.getContext(), PlayService.class);
+        getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -212,15 +239,13 @@ public class MainFragment extends BrowseFragment {
 
 
     private void loadLocalMusic(){
-        PlayList playList = new PlayList();
-        playList.setName("本地音乐");
-        playList.setDescription("本地音乐列表");
-        playList.setCoverImgUrl(" ");
+        localPlayList.setName("本地音乐");
+        localPlayList.setDescription("本地音乐列表");
+        localPlayList.setCoverImgUrl(" ");
         List<PlayList> playLists = new ArrayList<>();
-        playList.setSongList(Utils.getLocalMusics(this.getContext().getApplicationContext()));
-        playLists.add(playList);
+        localPlayList.setSongList(Utils.getLocalMusics(this.getContext().getApplicationContext()));
+        playLists.add(localPlayList);
         loadRows(playLists,3,"本地音乐");
     }
-
 
 }

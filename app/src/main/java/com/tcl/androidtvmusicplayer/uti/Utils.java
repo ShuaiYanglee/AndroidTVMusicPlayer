@@ -82,7 +82,8 @@ public class Utils {
             int count = cursor.getCount();
             while (cursor.moveToNext()){
                 Song song = new Song();
-                song.setName(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                song.setName(name);
                 String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                 Artist artist = new Artist();
                 ArrayList<Artist> artists = new ArrayList<>();
@@ -90,6 +91,7 @@ public class Utils {
                 artists.add(artist);
                 song.setArtists(artists);
                 Album album = new Album();
+                album.setName(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)));
                 album.setPicUrl(" ");
                 song.setAlbum(album);
                 song.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));

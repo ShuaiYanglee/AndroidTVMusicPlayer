@@ -61,6 +61,7 @@ public class PlayService extends Service {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         handler.sendEmptyMessage(Constants.MSG_MUSIC_INIT);
+                        play();
                     }
                 });
 

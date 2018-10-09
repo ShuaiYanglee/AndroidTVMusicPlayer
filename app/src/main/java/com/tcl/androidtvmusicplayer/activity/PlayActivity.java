@@ -35,6 +35,8 @@ import com.tcl.androidtvmusicplayer.service.PlayService;
 
 import com.tcl.androidtvmusicplayer.uti.Utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -51,6 +53,8 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     ImageButton btnListRepeatMode;
     TextView tvSongName;
     TextView tvSongArtists;
+    TextView tvSongPlayTime;
+    TextView tvSongTotalTime;
     ImageView ivSongPic;
     SeekBar songSeekBar;
     LrcView lrcView;
@@ -60,6 +64,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     Song song;
     List<Song> songList;
     MediaPlayer player;
+    DateFormat durationFormat = new SimpleDateFormat("mm:ss");
 
     Handler handler = new Handler() {
         @Override
@@ -68,7 +73,6 @@ public class PlayActivity extends Activity implements View.OnClickListener {
                 case Constants.MSG_MUSIC_INIT:
                     Utils.toast(PlayActivity.this, "准备完毕");
                     updateView(binder.getCurrentSong());
-                    btnPause.performClick();
                     break;
                 case Constants.MSG_MUSIC_START:
                     btnPause.setImageDrawable(getDrawable(R.drawable.ic_pause_selector));
@@ -128,6 +132,9 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         songSeekBar = findViewById(R.id.song_seek_bar);
         tvSongName = findViewById(R.id.tv_song_name);
         tvSongArtists = findViewById(R.id.tv_song_artists);
+        tvSongPlayTime = findViewById(R.id.tv_song_play_time);
+        tvSongTotalTime = findViewById(R.id.tv_song_total_time);
+
         lrcView = findViewById(R.id.lrc_view);
         ivSongPic = findViewById(R.id.iv_song_pic);
 
@@ -145,7 +152,8 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     public void updateView(Song song) {
         tvSongName.setText(song.getName());
         tvSongArtists.setText(song.getArtistsName());
-        GlideApp.with(this).load(song.getAlbum().getPicUrl()).circleCrop().into(ivSongPic);
+        tvSongTotalTime.setText(durationFormat.format(player.getDuration()));
+        GlideApp.with(this).load(song.getAlbum().getPicUrl()).error(getDrawable(R.drawable.ic_app_logo)).circleCrop().into(ivSongPic);
         GlideApp.with(this).load(song.getAlbum().getPicUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15, 3))).into(new SimpleTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
@@ -156,6 +164,27 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_selector));
         songSeekBar.setMax(player.getDuration());
         songSeekBar.setProgress(0);
+
+        songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser){
+                    player.seekTo(progress);
+                }
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         if (song.getSongLyric() != null)
             lrcView.loadLrc(song.getSongLyric());
     }
@@ -186,6 +215,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
                 long time = player.getCurrentPosition();
                 lrcView.updateTime(time);
                 songSeekBar.setProgress((int) time);
+                tvSongPlayTime.setText(durationFormat.format(time));
             }
             handler.postDelayed(this, 300);
         }
@@ -194,7 +224,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unbindService(connection);
+        unbindService(connection);
     }
 
 

@@ -3,6 +3,7 @@ package com.tcl.androidtvmusicplayer.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
@@ -12,6 +13,10 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.tcl.androidtvmusicplayer.R;
 import com.tcl.androidtvmusicplayer.uti.Utils;
@@ -25,6 +30,7 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Utils.toast(this,"欢迎使用MusicPlayer");
         setContentView(R.layout.activity_splash);
         checkPermission();
     }
@@ -36,7 +42,7 @@ public class SplashActivity extends Activity {
                     Manifest.permission.READ_EXTERNAL_STORAGE
             }, 1);
         } else {
-            splash();
+            scanMusicFile();
         }
 
     }
@@ -47,7 +53,7 @@ public class SplashActivity extends Activity {
         switch (requestCode){
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    splash();
+                    scanMusicFile();
                 }else {
                     Utils.toast(this,"你拒绝了权限，无法访问本地音乐");
                     finish();
@@ -59,7 +65,10 @@ public class SplashActivity extends Activity {
     }
 
 
-    private void splash(){
+
+    private void scanMusicFile(){
+        final ProgressBar progressBar = new ProgressBar(this);
+        progressBar.setVisibility(View.VISIBLE);
         File musicDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getPath());
         final File[] toBeScannedMusicFiles = musicDir.listFiles();
         if(toBeScannedMusicFiles != null) {
@@ -71,24 +80,13 @@ public class SplashActivity extends Activity {
                     toBeScannedMusicPath, null, new MediaScannerConnection.OnScanCompletedListener() {
                         @Override
                         public void onScanCompleted(String path, Uri uri) {
-                            Timer timer = new Timer();
-                            TimerTask timerTask = new TimerTask() {
-                                @Override
-                                public void run() {
-                                    leapToPlayActivity();
-                                    SplashActivity.this.finish();
-                                }
-                            };
-                            timer.schedule(timerTask, 3000);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
                         }
                     });
         }
     }
 
-
-    private void leapToPlayActivity(){
-        Intent intent = new Intent(this, MainActivity.class);
-
-        this.startActivity(intent);
-    }
 }

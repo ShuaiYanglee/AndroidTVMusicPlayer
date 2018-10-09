@@ -103,7 +103,10 @@ public class Song implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Song) {
-            if (this.getId() == ((Song) obj).getId())
+           /* if (this.getId() == ((Song) obj).getId())
+                return true;
+            else*/
+           if (this.getName() == ((Song) obj).getName())
                 return true;
         }
         return super.equals(obj);
