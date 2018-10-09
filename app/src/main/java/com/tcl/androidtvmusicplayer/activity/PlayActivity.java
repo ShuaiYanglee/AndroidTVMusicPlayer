@@ -156,7 +156,8 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_selector));
         songSeekBar.setMax(player.getDuration());
         songSeekBar.setProgress(0);
-        lrcView.loadLrc(song.getSongLyric());
+        if (song.getSongLyric() != null)
+            lrcView.loadLrc(song.getSongLyric());
     }
 
     @Override
@@ -193,7 +194,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
+        //unbindService(connection);
     }
 
 

@@ -1,8 +1,11 @@
 package com.tcl.androidtvmusicplayer.fragment;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +20,8 @@ import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -33,7 +38,10 @@ import com.tcl.androidtvmusicplayer.entity.Artist;
 import com.tcl.androidtvmusicplayer.entity.PlayList;
 import com.tcl.androidtvmusicplayer.presenter.CardPresenter;
 import com.tcl.androidtvmusicplayer.uti.HttpUtils;
+import com.tcl.androidtvmusicplayer.uti.Utils;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -66,11 +74,13 @@ public class MainFragment extends BrowseFragment {
         prepareBackgroundManager();
         initAdapter();
         setupEventListener();
+
     }
 
     private void initAdapter() {
         rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setAdapter(rowsAdapter);
+        loadLocalMusic();
 
     }
 
@@ -148,7 +158,10 @@ public class MainFragment extends BrowseFragment {
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
             Intent intent = new Intent(getActivity(), PlayListActivity.class);
             if (item instanceof PlayList) {
-                intent.putExtra(Constants.PLAYLIST, ((PlayList) item).getId());
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Constants.PLAYLIST_ID,((PlayList) item).getId());
+                bundle.putSerializable(Constants.LOCAL_PLAY_LIST, (Serializable) ((PlayList) item).getSongList());
+                intent.putExtra(Constants.BUNDLE,bundle);
             }
             if (item instanceof Artist) {
                 intent.putExtra(Constants.ARTIST, ((Artist) item).getId());
@@ -193,6 +206,20 @@ public class MainFragment extends BrowseFragment {
         }
         backgroundTimer = new Timer();
         backgroundTimer.schedule(new UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY);
+    }
+
+
+
+
+    private void loadLocalMusic(){
+        PlayList playList = new PlayList();
+        playList.setName("本地音乐");
+        playList.setDescription("本地音乐列表");
+        playList.setCoverImgUrl(" ");
+        List<PlayList> playLists = new ArrayList<>();
+        playList.setSongList(Utils.getLocalMusics(this.getContext().getApplicationContext()));
+        playLists.add(playList);
+        loadRows(playLists,3,"本地音乐");
     }
 
 

@@ -29,6 +29,11 @@ public class Song implements Serializable {
     private String songLyric;//歌曲歌词
 
 
+    private int duration;
+
+    private String path;
+
+
     public String getName() {
         return name;
     }
@@ -102,5 +107,22 @@ public class Song implements Serializable {
                 return true;
         }
         return super.equals(obj);
+    }
+
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

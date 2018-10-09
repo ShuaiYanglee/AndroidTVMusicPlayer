@@ -64,16 +64,20 @@ public class PlayListFragment extends VerticalGridFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        long playListId = getActivity().getIntent().getLongExtra(Constants.PLAYLIST, 0);
+        beforeInitData();
+        Bundle bundle = getActivity().getIntent().getBundleExtra(Constants.BUNDLE);
+        long playListId = (long) bundle.getSerializable(Constants.PLAYLIST_ID);
+
         long artistId = getActivity().getIntent().getLongExtra(Constants.ARTIST, 0);
         if (artistId != 0) {
             HttpUtils.doGetRequest(Constants.ARTIST_DETAIL + artistId, new ArtistDetailCallBack(this));
-
         }
         if (playListId != 0) {
             HttpUtils.doGetRequest(Constants.PLAYLIST_DETAIL + playListId, new PlayListCallBack(this));
+        }else {
+            songList = (List<Song>) bundle.getSerializable(Constants.LOCAL_PLAY_LIST);
+            loadRows(songList);
         }
-        beforeInitData();
     }
 
     //获得数据前的准备

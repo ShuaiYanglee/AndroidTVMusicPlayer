@@ -37,6 +37,6 @@ public class SongLyricCallBack extends BaseCallBack {
         object = object.getAsJsonObject("lrc");
         String lyric = object.get("lyric").getAsString();
         song.setSongLyric(Utils.parseSongLyric(lyric));
-        binder.playMusic();
+        binder.playMusic(song.getUrl());
     }
 }

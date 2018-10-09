@@ -13,6 +13,7 @@ public class Constants {
     public static final String SERVER_HOST = "http://10.120.5.25:3000/";
 
 
+
     //华语热门歌单
     public static final String PLAYLIST_URL_CAT = SERVER_HOST + "top/playlist?cat=华语&limit=10&order=hot";
 
@@ -38,7 +39,9 @@ public class Constants {
     public static final String SONG_LYRIC = SERVER_HOST + "lyric?id=";
 
     //Intent传递的参数
-    public static final String PLAYLIST = "playlist";
+    public static final String PLAYLIST_ID = "playlist";
+
+    public static final String LOCAL_PLAY_LIST = "localPlaylist";
 
     //Intent传递的参数
     public static final String ARTIST = "artist";

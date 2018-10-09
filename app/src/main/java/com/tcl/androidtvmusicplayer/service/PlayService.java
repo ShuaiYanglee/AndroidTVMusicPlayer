@@ -43,15 +43,19 @@ public class PlayService extends Service {
 
         public void initData(Song song) {
             setCurrentSong(song);
-            String songUrl = Constants.SONG_URL + currentSong.getId() + ".mp3";
-            currentSong.setUrl(songUrl);
-            HttpUtils.doGetRequest(Constants.SONG_LYRIC + currentSong.getId(), new SongLyricCallBack(this, currentSong));
+            if (currentSong.getId() != 0){
+                String songUrl = Constants.SONG_URL + currentSong.getId() + ".mp3";
+                currentSong.setUrl(songUrl);
+                HttpUtils.doGetRequest(Constants.SONG_LYRIC + currentSong.getId(), new SongLyricCallBack(this, currentSong));
+            }else{
+                playMusic(currentSong.getPath());
+            }
         }
 
-        public void playMusic() {
+        public void playMusic(String url) {
             player.reset();
             try {
-                player.setDataSource(currentSong.getUrl());
+                player.setDataSource(url);
                 player.prepareAsync();
                 player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
