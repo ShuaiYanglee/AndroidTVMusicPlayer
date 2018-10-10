@@ -6,17 +6,21 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import com.tcl.androidtvmusicplayer.R;
+import android.view.KeyEvent;
 
-public class MainActivity extends Activity {
+import com.tcl.androidtvmusicplayer.R;
+import com.tcl.androidtvmusicplayer.uti.ActivityCollector;
+
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActivityCollector.addActivity(this);
     }
 
-    /*@Override
+    @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("退出提示");
@@ -35,6 +39,6 @@ public class MainActivity extends Activity {
             }
         });
         builder.show();
-    }*/
+    }
 
 }

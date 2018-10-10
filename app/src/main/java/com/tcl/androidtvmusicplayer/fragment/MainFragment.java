@@ -248,4 +248,12 @@ public class MainFragment extends BrowseFragment {
         loadRows(playLists,3,"本地音乐");
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unbindService(connection);
+        binder.getMediaPlayer().stop();
+        binder.getMediaPlayer().release();
+
+    }
 }

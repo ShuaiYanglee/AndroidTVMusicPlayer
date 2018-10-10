@@ -19,9 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by yangshuai on 2018/9/23.
+ * Created by yangshuai on 2018/10/10.
  *
- * @Description:
+ * @Description: 常用工具类
  */
 
 public class Utils {
@@ -73,7 +73,7 @@ public class Utils {
     }
 
 
-
+    //本地音乐文件扫描
     public static List<Song> getLocalMusics(Context context){
         List<Song> songList = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,

@@ -37,21 +37,24 @@ public class PlayService extends Service {
 
     public class MyBinder extends Binder {
         private Handler handler;
-        private List<Song> songList;
-        private Song currentSong;
+        private List<Song> songList;//歌曲列表
+        private Song currentSong;//现在播放的歌曲
+        private Song previousSong;//前一首播放的歌曲
         private int currentMode = 0;
 
+        //初始化播放的音乐数据
         public void initData(Song song) {
             setCurrentSong(song);
-            if (currentSong.getId() != 0){
+            if (currentSong.getId() != 0) {
                 String songUrl = Constants.SONG_URL + currentSong.getId() + ".mp3";
                 currentSong.setUrl(songUrl);
                 HttpUtils.doGetRequest(Constants.SONG_LYRIC + currentSong.getId(), new SongLyricCallBack(this, currentSong));
-            }else{
+            } else {
                 playMusic(currentSong.getPath());
             }
         }
 
+        //播放音乐，并通过handler更新UI
         public void playMusic(String url) {
             player.reset();
             try {
@@ -76,7 +79,9 @@ public class PlayService extends Service {
             }
         }
 
+        //播放下一首
         public void playNext() {
+            previousSong = currentSong;
             int index = songList.indexOf(currentSong);
             int nextIndex = (index + 1) % songList.size();
             switch (getCurrentMode()) {
@@ -100,17 +105,25 @@ public class PlayService extends Service {
             }
         }
 
+        //播放上一首
+        public void playPreviousSong() {
+            initData(previousSong);
+        }
 
+
+        //设置播放模式
         public void setPlayMode() {
             currentMode = (currentMode + 1) % 4;
             handler.sendEmptyMessage(Constants.MSG_UPDATE_PLAY_MODE);
         }
 
+        //获得播放模式
         public int getCurrentMode() {
             return currentMode;
         }
 
 
+        //播放或暂停逻辑控制
         public void play() {
             if (!player.isPlaying()) {
                 player.start();

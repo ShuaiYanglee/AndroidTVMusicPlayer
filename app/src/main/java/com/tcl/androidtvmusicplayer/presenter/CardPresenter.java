@@ -25,8 +25,8 @@ public class CardPresenter extends Presenter {
 
     private static final String TAG = "CardPresenter";
 
-    private static final int CARD_WIDTH = 313;
-    private static final int CARD_HEIGHT = 176;
+    private static final int CARD_WIDTH = 400;
+    private static final int CARD_HEIGHT = 200;
     private static int selectedBackgroundColor;//被选中后的卡片背景色
     private static int defaultBackgroundColor;//默认的卡片背景色
     private Drawable defaultCardImage;//卡片默认图片
@@ -71,21 +71,17 @@ public class CardPresenter extends Presenter {
         }
 
         if (item instanceof Song) {
-            contentText = new String(" ");
             titleText = ((Song) item).getName();
             picUrl = ((Song) item).getAlbum().getPicUrl();
-            List<Artist> artistList = ((Song) item).getArtists();
-            for (Artist artist : artistList
-                    ) {
-                contentText += artist.getName() + " ";
-            }
+            contentText = "";
+            contentText += "歌手："+((Song) item).getArtistsName()+" 专辑："+((Song) item).getAlbum().getName();
         }
-
         if (picUrl != null) {
             cardView.setTitleText(titleText);
             if (contentText != null) {
                 cardView.setContentText(contentText);
             }
+
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             GlideApp.with(viewHolder.view.getContext()).load(picUrl)
                     .centerCrop().error(defaultCardImage).into(cardView.getMainImageView());

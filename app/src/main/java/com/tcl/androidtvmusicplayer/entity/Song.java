@@ -106,7 +106,7 @@ public class Song implements Serializable {
            /* if (this.getId() == ((Song) obj).getId())
                 return true;
             else*/
-           if (this.getName() == ((Song) obj).getName())
+           if (this.getName().equals(((Song) obj).getName()))
                 return true;
         }
         return super.equals(obj);

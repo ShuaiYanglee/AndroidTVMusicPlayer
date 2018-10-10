@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SplashActivity extends Activity {
+public class SplashActivity extends BaseActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +80,18 @@ public class SplashActivity extends Activity {
                     toBeScannedMusicPath, null, new MediaScannerConnection.OnScanCompletedListener() {
                         @Override
                         public void onScanCompleted(String path, Uri uri) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            TimerTask timerTask = new TimerTask() {
+                                @Override
+                                public void run() {
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            };
+                            Timer timer = new Timer();
+                            timer.schedule(timerTask,3000);
+
                         }
                     });
         }

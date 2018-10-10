@@ -43,7 +43,7 @@ import jp.wasabeef.glide.transformations.BlurTransformation;
 import me.wcy.lrcview.LrcView;
 
 
-public class PlayActivity extends Activity implements View.OnClickListener {
+public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "PlayActivity";
 
@@ -66,6 +66,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     MediaPlayer player;
     DateFormat durationFormat = new SimpleDateFormat("mm:ss");
 
+    //handler处理界面更新操作
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -94,6 +95,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     };
 
 
+    //服务初始化
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -165,6 +167,7 @@ public class PlayActivity extends Activity implements View.OnClickListener {
         songSeekBar.setMax(player.getDuration());
         songSeekBar.setProgress(0);
 
+        //seekBar快进快退
         songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -185,15 +188,17 @@ public class PlayActivity extends Activity implements View.OnClickListener {
 
             }
         });
+        //加载歌词
         if (song.getSongLyric() != null)
             lrcView.loadLrc(song.getSongLyric());
     }
 
+    //歌曲控制
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.image_button_pre:
-                binder.playNext();
+                binder.playPreviousSong();
                 break;
             case R.id.image_button_next:
                 binder.playNext();
@@ -224,10 +229,11 @@ public class PlayActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
+
     }
 
 
+    //更新播放模式按钮的背景图片
     private void updatePlayMode(int playMode) {
         switch (playMode) {
             case Constants.MODE_REPEAT_LIST:
@@ -244,6 +250,9 @@ public class PlayActivity extends Activity implements View.OnClickListener {
                 break;
         }
     }
+
+
+
 
 
 }
