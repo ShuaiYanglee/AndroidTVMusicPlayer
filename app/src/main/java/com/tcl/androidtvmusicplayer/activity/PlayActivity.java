@@ -1,6 +1,7 @@
 package com.tcl.androidtvmusicplayer.activity;
 
-import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -10,13 +11,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.NonNull;
+
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
 
-
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -31,10 +33,12 @@ import com.tcl.androidtvmusicplayer.R;
 
 import com.tcl.androidtvmusicplayer.constant.Constants;
 import com.tcl.androidtvmusicplayer.entity.Song;
+import com.tcl.androidtvmusicplayer.fragment.SimpleSongListFragment;
 import com.tcl.androidtvmusicplayer.service.PlayService;
 
 import com.tcl.androidtvmusicplayer.uti.Utils;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -51,6 +55,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     ImageButton btnNext;
     ImageButton btnPause;
     ImageButton btnListRepeatMode;
+    ImageButton btnSongList;
     TextView tvSongName;
     TextView tvSongArtists;
     TextView tvSongPlayTime;
@@ -58,6 +63,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     ImageView ivSongPic;
     SeekBar songSeekBar;
     LrcView lrcView;
+
+    FrameLayout flFragment;
+
+    SimpleSongListFragment fragment;
+    FragmentManager fragmentManager;
+    FragmentTransaction transaction;
 
     BackgroundManager manager;
     PlayService.MyBinder binder;
@@ -131,6 +142,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         btnNext = findViewById(R.id.image_button_next);
         btnPause = findViewById(R.id.image_button_pause);
         btnListRepeatMode = findViewById(R.id.image_button_list_repeat_mode);
+        btnSongList = findViewById(R.id.image_button_song_list);
+        flFragment = findViewById(R.id.fl_fragment);
+
         songSeekBar = findViewById(R.id.song_seek_bar);
         tvSongName = findViewById(R.id.tv_song_name);
         tvSongArtists = findViewById(R.id.tv_song_artists);
@@ -148,6 +162,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         btnPause.setOnClickListener(this);
         btnPause.setFocusedByDefault(true);
         btnListRepeatMode.setOnClickListener(this);
+        btnSongList.setOnClickListener(this);
     }
 
     //音乐数据准备完后更新界面
@@ -156,12 +171,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         tvSongArtists.setText(song.getArtistsName());
         tvSongTotalTime.setText(durationFormat.format(player.getDuration()));
         GlideApp.with(this).load(song.getAlbum().getPicUrl()).error(getDrawable(R.drawable.ic_app_logo)).circleCrop().into(ivSongPic);
-        GlideApp.with(this).load(song.getAlbum().getPicUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15, 3))).into(new SimpleTarget<Drawable>() {
-            @Override
-            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                manager.setDrawable(resource);
-            }
-        });
 
         btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_selector));
         songSeekBar.setMax(player.getDuration());
@@ -171,7 +180,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser){
+                if (fromUser) {
                     player.seekTo(progress);
                 }
 
@@ -209,6 +218,18 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
             case R.id.image_button_list_repeat_mode:
                 binder.setPlayMode();
                 break;
+            case R.id.image_button_song_list:
+                flFragment.setVisibility(View.VISIBLE);
+                fragment = new SimpleSongListFragment();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Constants.LOCAL_PLAY_LIST, (Serializable) songList);
+                bundle.putSerializable(Constants.CURRENT_SONG_INDEX, binder.getCurrentSongIndex());
+                fragment.setArguments(bundle);
+                fragmentManager = getFragmentManager();
+                transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.fl_fragment, fragment);
+                transaction.commit();
+                break;
         }
     }
 
@@ -227,8 +248,20 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     };
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        GlideApp.with(this).load(song.getAlbum().getPicUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15, 3))).into(new SimpleTarget<Drawable>() {
+            @Override
+            public void onResourceReady(@Nullable Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                manager.setDrawable(resource);
+            }
+        });
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        unbindService(connection);
 
     }
 
@@ -251,8 +284,16 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-
-
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_E:
+                transaction.remove(fragment);
+                flFragment.setVisibility(View.GONE);
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 
 }

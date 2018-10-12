@@ -111,7 +111,6 @@ public class PlayListFragment extends VerticalGridFragment {
         setGridPresenter(gridPresenter);
         adapter = new ArrayObjectAdapter(new CardPresenter());
         setAdapter(adapter);
-
     }
 
     public void loadRows(PlayList list) {
@@ -188,6 +187,7 @@ public class PlayListFragment extends VerticalGridFragment {
                     bundle.putSerializable(Constants.SONG, song);
                     intent.putExtra(Constants.BUNDLE, bundle);
                     startActivity(intent);
+                    getActivity().finish();
                 }
             }
         }

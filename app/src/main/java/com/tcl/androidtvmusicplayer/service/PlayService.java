@@ -40,11 +40,13 @@ public class PlayService extends Service {
         private List<Song> songList;//歌曲列表
         private Song currentSong;//现在播放的歌曲
         private Song previousSong;//前一首播放的歌曲
+        private int currentSongIndex;
         private int currentMode = 0;
 
         //初始化播放的音乐数据
         public void initData(Song song) {
             setCurrentSong(song);
+            currentSongIndex = songList.indexOf(currentSong);
             if (currentSong.getId() != 0) {
                 String songUrl = Constants.SONG_URL + currentSong.getId() + ".mp3";
                 currentSong.setUrl(songUrl);
@@ -82,14 +84,13 @@ public class PlayService extends Service {
         //播放下一首
         public void playNext() {
             previousSong = currentSong;
-            int index = songList.indexOf(currentSong);
-            int nextIndex = (index + 1) % songList.size();
+            int nextIndex = (currentSongIndex + 1) % songList.size();
             switch (getCurrentMode()) {
                 case Constants.MODE_REPEAT_LIST:
                     initData(songList.get(nextIndex));
                     break;
                 case Constants.MODE_REPEAT_SINGLE:
-                    initData(songList.get(index));
+                    initData(songList.get(currentSongIndex));
                     break;
                 case Constants.MODE_REPEAT_RANDOM:
                     Random random = new Random();
@@ -152,6 +153,10 @@ public class PlayService extends Service {
 
         public MediaPlayer getMediaPlayer() {
             return player;
+        }
+
+        public int getCurrentSongIndex(){
+            return currentSongIndex;
         }
 
 
